@@ -1,7 +1,12 @@
 function normalize(name) {
   return name
     .toLowerCase()
+    .replace(/professional/g, "")
     .replace(/[^a-z0-9]/g, "");
+}
+
+function removeDigits(name) {
+  return name.replace(/[0-9]/g, "");
 }
 
 function matchFixtures(mvrGroups, gdtfLibrary) {
@@ -17,14 +22,20 @@ function matchFixtures(mvrGroups, gdtfLibrary) {
     }
 
     const normalizedGroup = normalize(group.name);
+    const groupNoDigits = removeDigits(normalizedGroup);
 
     let bestMatch = null;
 
     Object.values(gdtfLibrary).forEach(item => {
       const normalizedLib = normalize(item.name);
+      const libNoDigits = removeDigits(normalizedLib);
 
-      if (normalizedLib.includes(normalizedGroup) ||
-          normalizedGroup.includes(normalizedLib)) {
+      if (
+        normalizedLib.includes(normalizedGroup) ||
+        normalizedGroup.includes(normalizedLib) ||
+        libNoDigits.includes(groupNoDigits) ||
+        groupNoDigits.includes(libNoDigits)
+      ) {
         bestMatch = item;
       }
     });
