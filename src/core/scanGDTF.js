@@ -1,6 +1,21 @@
 const fs = require("fs");
 const path = require("path");
 
+function cleanGDTFName(file) {
+  let name = file.replace(".gdtf", "");
+
+  // decode URL encoding
+  name = decodeURIComponent(name);
+
+  // replace underscores with spaces
+  name = name.replace(/_/g, " ");
+
+  // remove version / extra garbage (numbers + suffix)
+  name = name.replace(/\d{6,}.*/, "");
+
+  return name.trim();
+}
+
 function scanGDTFFolder(folderPath) {
   if (!fs.existsSync(folderPath)) {
     throw new Error("GDTF folder does not exist");
@@ -14,9 +29,7 @@ function scanGDTFFolder(folderPath) {
 
   gdtfFiles.forEach(file => {
     const fullPath = path.join(folderPath, file);
-
-    // Simple version: use filename as key for now
-    const name = file.replace(".gdtf", "");
+    const name = cleanGDTFName(file);
 
     library[name] = {
       name,
