@@ -29,18 +29,35 @@ function parseMVR(filePath) {
 }
 
 function extractFixtures(json) {
-  const fixtures =
-    json?.GeneralSceneDescription?.Scene?.Fixture ||
-    json?.GeneralSceneDescription?.Fixture;
+  const layers =
+    json?.GeneralSceneDescription?.Scene?.Layers?.Layer;
 
-  if (!fixtures) return [];
+  if (!layers) return [];
 
-  const fixtureArray = Array.isArray(fixtures) ? fixtures : [fixtures];
+  const layerArray = Array.isArray(layers) ? layers : [layers];
 
-  return fixtureArray.map(f => ({
-    name: f.Name || "Unnamed",
-    gdtfSpec: f.GDTFSpec || "Unknown"
-  }));
+  const fixtures = [];
+
+  layerArray.forEach(layer => {
+    const childList = layer.ChildList;
+
+    if (!childList) return;
+
+    if (childList.Fixture) {
+      const list = Array.isArray(childList.Fixture)
+        ? childList.Fixture
+        : [childList.Fixture];
+
+      list.forEach(f => {
+        fixtures.push({
+          name: f.Name || "Unnamed",
+          gdtfSpec: f.GDTFSpec || "Unknown"
+        });
+      });
+    }
+  });
+
+  return fixtures;
 }
 
 module.exports = {
