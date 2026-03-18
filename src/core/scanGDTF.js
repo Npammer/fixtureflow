@@ -13,7 +13,16 @@ function cleanGDTFName(file) {
   // remove version / extra garbage (numbers + suffix)
   name = name.replace(/\d{6,}.*/, "");
 
-  return name.trim();
+  // normalize manufacturer naming
+  name = name.replace(/martin professional/gi, "martin");
+
+  // remove multiple spaces
+  name = name.replace(/\s+/g, " ");
+
+  // trim
+  name = name.trim();
+
+  return name;
 }
 
 function scanGDTFFolder(folderPath) {
