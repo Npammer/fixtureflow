@@ -5,3 +5,4 @@ dist
 *.log
 *.mvr
 fixtures/
+mapping.json
