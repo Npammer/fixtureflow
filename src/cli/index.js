@@ -4,6 +4,8 @@ const { parseMVR } = require("../core/parseMVR");
 const { groupFixtures } = require("../core/groupFixtures");
 const { scanGDTFFolder } = require("../core/scanGDTF");
 const { matchFixtures } = require("../core/matchFixtures");
+const { loadMapping } = require("../core/loadMapping");
+const { applyMapping } = require("../core/applyMapping");
 
 const filePath = process.argv[2];
 
@@ -23,17 +25,23 @@ try {
 
   const matched = matchFixtures(grouped, library);
 
-  console.log("🎯 Fixture matches:\n");
+  const mapping = loadMapping("./mapping.json");
 
-  matched.forEach(group => {
-        if (group.status === "exact") {
-            console.log(`🟢 ${group.name} (${group.count}) → ${group.match}`);
-        } else if (group.status === "fuzzy") {
-            console.log(`🟡 ${group.name} (${group.count}) → ${group.match}`);
-        } else {
-            console.log(`🔴 ${group.name} (${group.count}) → no match`);
-        }
-    });
+  const finalResults = applyMapping(matched, mapping);
+
+  console.log("🎯 Final fixture mapping:\n");
+
+  finalResults.forEach(group => {
+    if (group.source === "mapping") {
+      console.log(`🔵 ${group.name} (${group.count}) → ${group.final}`);
+    } else if (group.status === "exact") {
+      console.log(`🟢 ${group.name} (${group.count}) → ${group.final}`);
+    } else if (group.status === "fuzzy") {
+      console.log(`🟡 ${group.name} (${group.count}) → ${group.final}`);
+    } else {
+      console.log(`🔴 ${group.name} (${group.count}) → no match`);
+    }
+  });
 
 } catch (err) {
   console.error("❌ Error:", err.message);
